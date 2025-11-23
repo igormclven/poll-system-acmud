@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { auth } from './auth';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Proteger rutas /admin/*
   if (request.nextUrl.pathname.startsWith('/admin')) {
     const session = await auth();
@@ -25,3 +25,4 @@ export const config = {
     '/((?!api/auth|_next/static|_next/image|favicon.ico).*)',
   ],
 };
+

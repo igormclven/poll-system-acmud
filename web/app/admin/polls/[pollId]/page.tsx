@@ -3,6 +3,10 @@
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import AnimatedBackground from '../../../components/AnimatedBackground';
+import GlassCard from '../../../components/GlassCard';
+import Button from '../../../components/Button';
 
 interface Poll {
   id: string;
@@ -199,329 +203,452 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center py-12">
-            <div className="text-gray-500">Loading poll details...</div>
+      <>
+        <AnimatedBackground />
+        <div className="min-h-screen py-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center py-12">
+              <motion.div
+                className="inline-block w-16 h-16 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+              />
+              <p className="mt-4 text-[var(--foreground-secondary)]">Loading poll details...</p>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (error || !poll) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-6">
-            <Link href="/admin" className="text-indigo-600 hover:text-indigo-800 text-sm">
-              ← Back to Dashboard
-            </Link>
-          </div>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-700">
-            <h2 className="text-xl font-bold mb-2">Error Loading Poll</h2>
-            <p>{error || 'Poll not found'}</p>
+      <>
+        <AnimatedBackground />
+        <div className="min-h-screen py-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="mb-6">
+              <Link 
+                href="/admin" 
+                className="text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)] text-sm font-medium inline-flex items-center gap-2 transition-colors"
+              >
+                <span>←</span>
+                <span>Back to Dashboard</span>
+              </Link>
+            </div>
+            <GlassCard className="border-2 border-[var(--error)] bg-[var(--error-light)]">
+              <h2 className="text-xl font-bold mb-2 text-[var(--error)] flex items-center gap-2">
+                <span>⚠️</span>
+                Error Loading Poll
+              </h2>
+              <p className="text-[var(--error)]">{error || 'Poll not found'}</p>
+            </GlassCard>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Breadcrumb */}
-        <div className="mb-6 flex items-center justify-between">
-          <Link href="/admin" className="text-indigo-600 hover:text-indigo-800 text-sm">
-            ← Back to Dashboard
-          </Link>
-          <div className="flex gap-2">
-            <Link
-              href={`/admin/polls/${pollId}/keys`}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
+    <>
+      <AnimatedBackground />
+      <div className="min-h-screen py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Breadcrumb */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="mb-6 flex items-center justify-between"
+          >
+            <Link 
+              href="/admin" 
+              className="text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)] text-sm font-medium inline-flex items-center gap-2 transition-colors"
             >
-              📋 Access Keys
+              <span>←</span>
+              <span>Back to Dashboard</span>
             </Link>
-          </div>
-        </div>
+            <Link href={`/admin/polls/${pollId}/keys`}>
+              <Button variant="primary">
+                🔑 Access Keys
+              </Button>
+            </Link>
+          </motion.div>
 
-        {/* Poll Details Card */}
-        <div className="bg-white rounded-lg shadow-md p-8 mb-6">
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{poll.title}</h1>
-              {poll.description && (
-                <p className="text-gray-600 mb-4">{poll.description}</p>
-              )}
-              <div className="flex flex-wrap gap-2">
-                {poll.isRecurring && (
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                    🔄 {getRecurrenceLabel(poll.recurrenceType)}
-                  </span>
-                )}
-                {poll.allowSuggestions && (
-                  <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                    💡 Suggestions Enabled
-                  </span>
-                )}
-                <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
-                  ⏱️ {poll.durationDays || 'N/A'} days duration
-                </span>
-              </div>
-            </div>
-            <div className="text-right text-sm text-gray-500">
-              <div>Created: {formatDate(poll.createdAt)}</div>
-              {poll.startDate && (
-                <div>Starts: {formatDate(poll.startDate)}</div>
-              )}
-              {poll.endDate && (
-                <div>Ends: {formatDate(poll.endDate)}</div>
-              )}
-            </div>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="grid md:grid-cols-3 gap-4 mt-6 pt-6 border-t">
-            <div className="bg-green-50 rounded-lg p-4">
-              <div className="text-green-600 text-sm font-medium mb-1">Status</div>
-              <div className="text-2xl font-bold text-green-700">
-                {activeInstance ? 'Active' : 'No Active Instance'}
-              </div>
-            </div>
-            <div className="bg-blue-50 rounded-lg p-4">
-              <div className="text-blue-600 text-sm font-medium mb-1">Total Votes</div>
-              <div className="text-2xl font-bold text-blue-700">
-                {results?.totalVotes || 0}
-              </div>
-            </div>
-            <div className="bg-purple-50 rounded-lg p-4">
-              <div className="text-purple-600 text-sm font-medium mb-1">Poll ID</div>
-              <div className="text-sm font-mono text-purple-700 truncate" title={pollId}>
-                {pollId.substring(0, 16)}...
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Active Instance */}
-        {activeInstance && (
-          <div className="bg-white rounded-lg shadow-md p-8 mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">🟢 Active Instance</h2>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-              <div className="grid md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <div className="text-sm text-gray-600">Instance ID</div>
-                  <div className="font-mono text-sm text-gray-900">{activeInstance.instanceId}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">Status</div>
-                  <div className="font-semibold text-green-700">{activeInstance.status}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">Start Date</div>
-                  <div className="text-sm text-gray-900">{formatDate(activeInstance.startDate)}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">End Date</div>
-                  <div className="text-sm text-gray-900">{formatDate(activeInstance.endDate)}</div>
-                </div>
-              </div>
-              
-              <div className="mt-4">
-                <div className="text-sm font-medium text-gray-700 mb-2">Options:</div>
-                <div className="grid md:grid-cols-2 gap-2">
-                  {activeInstance.options.map((option, index) => (
-                    <div key={option.id} className="flex items-center p-3 bg-white rounded border border-gray-200">
-                      <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold mr-3">
-                        {index + 1}
+          {/* Poll Details Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <GlassCard variant="elevated" className="mb-6">
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex-1">
+                  <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">{poll.title}</h1>
+                  {poll.description && (
+                    <p className="text-[var(--foreground-secondary)] mb-4">{poll.description}</p>
+                  )}
+                  <div className="flex flex-wrap gap-2">
+                    {poll.isRecurring && (
+                      <span className="px-3 py-1 glass rounded-full text-sm font-medium text-[var(--accent-primary)] border border-[var(--accent-primary)]">
+                        🔄 {getRecurrenceLabel(poll.recurrenceType)}
                       </span>
-                      <span className="text-gray-900">{option.text}</span>
-                    </div>
-                  ))}
+                    )}
+                    {poll.allowSuggestions && (
+                      <span className="px-3 py-1 glass rounded-full text-sm font-medium text-[var(--accent-secondary)] border border-[var(--accent-secondary)]">
+                        💡 Suggestions Enabled
+                      </span>
+                    )}
+                    <span className="px-3 py-1 glass rounded-full text-sm font-medium text-[var(--foreground-secondary)] border border-[var(--glass-border)]">
+                      ⏱️ {poll.durationDays || 'N/A'} days duration
+                    </span>
+                  </div>
+                </div>
+                <div className="text-right text-sm text-[var(--foreground-muted)]">
+                  <div>Created: {formatDate(poll.createdAt)}</div>
+                  {poll.startDate && (
+                    <div>Starts: {formatDate(poll.startDate)}</div>
+                  )}
+                  {poll.endDate && (
+                    <div>Ends: {formatDate(poll.endDate)}</div>
+                  )}
                 </div>
               </div>
-            </div>
-          </div>
-        )}
 
-        {/* Results Section */}
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">📊 Results</h2>
-            {activeInstance && (
-              <button
-                onClick={() => loadResults(selectedInstanceId)}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium"
-              >
-                🔄 Refresh Results
-              </button>
-            )}
-          </div>
-
-          {loadingResults ? (
-            <div className="text-center py-8 text-gray-500">Loading results...</div>
-          ) : results && results.totalVotes > 0 && Array.isArray(results.results) ? (
-            <div className="space-y-4">
-              <div className="mb-4 text-sm text-gray-600">
-                Total Votes: <span className="font-bold text-gray-900">{results.totalVotes}</span>
+              {/* Quick Stats */}
+              <div className="grid md:grid-cols-3 gap-4 mt-6 pt-6 glass-border">
+                <motion.div
+                  className="glass rounded-lg p-4 border-2 border-[var(--success)]"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className="text-[var(--success)] text-sm font-medium mb-1">Status</div>
+                  <div className="text-2xl font-bold text-[var(--foreground)]">
+                    {activeInstance ? '🟢 Active' : '⚪ Inactive'}
+                  </div>
+                </motion.div>
+                <motion.div
+                  className="glass rounded-lg p-4 border-2 border-[var(--accent-primary)]"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className="text-[var(--accent-primary)] text-sm font-medium mb-1">Total Votes</div>
+                  <div className="text-2xl font-bold text-[var(--foreground)]">
+                    {results?.totalVotes || 0}
+                  </div>
+                </motion.div>
+                <motion.div
+                  className="glass rounded-lg p-4 border-2 border-[var(--accent-tertiary)]"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className="text-[var(--accent-tertiary)] text-sm font-medium mb-1">Poll ID</div>
+                  <div className="text-sm font-mono text-[var(--foreground)] truncate" title={pollId}>
+                    {pollId.substring(0, 16)}...
+                  </div>
+                </motion.div>
               </div>
-              
-              {results.results.map((result, index) => (
-                <div key={result.optionId} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center">
-                      <span className="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center text-sm font-bold mr-3">
-                        {index + 1}
-                      </span>
-                      <span className="font-medium text-gray-900">{result.optionText}</span>
+            </GlassCard>
+          </motion.div>
+
+          {/* Active Instance */}
+          {activeInstance && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <GlassCard variant="elevated" className="mb-6 border-2 border-[var(--success)]">
+                <h2 className="text-2xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                  <span>🟢</span>
+                  Active Instance
+                </h2>
+                <div className="glass rounded-lg p-6 border border-[var(--success)]">
+                  <div className="grid md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <div className="text-sm text-[var(--foreground-muted)]">Instance ID</div>
+                      <div className="font-mono text-sm text-[var(--foreground)]">{activeInstance.instanceId}</div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-indigo-600">{result.votes}</div>
-                      <div className="text-sm text-gray-500">{result.percentage.toFixed(1)}%</div>
+                    <div>
+                      <div className="text-sm text-[var(--foreground-muted)]">Status</div>
+                      <div className="font-semibold text-[var(--success)]">{activeInstance.status}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-[var(--foreground-muted)]">Start Date</div>
+                      <div className="text-sm text-[var(--foreground)]">{formatDate(activeInstance.startDate)}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-[var(--foreground-muted)]">End Date</div>
+                      <div className="text-sm text-[var(--foreground)]">{formatDate(activeInstance.endDate)}</div>
                     </div>
                   </div>
                   
-                  {/* Progress Bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-3 mt-3">
-                    <div
-                      className="bg-indigo-600 h-3 rounded-full transition-all duration-500"
-                      style={{ width: `${result.percentage}%` }}
-                    />
+                  <div className="mt-4">
+                    <div className="text-sm font-medium text-[var(--foreground-secondary)] mb-2">Options:</div>
+                    <div className="grid md:grid-cols-2 gap-2">
+                      {activeInstance.options.map((option, index) => (
+                        <motion.div
+                          key={option.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.3 + index * 0.05 }}
+                          className="flex items-center p-3 glass rounded border border-[var(--glass-border)]"
+                        >
+                          <span className="w-6 h-6 rounded-full bg-[var(--accent-primary)] text-white flex items-center justify-center text-xs font-bold mr-3">
+                            {index + 1}
+                          </span>
+                          <span className="text-[var(--foreground)]">{option.text}</span>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 text-gray-500">
-              <div className="text-4xl mb-4">📭</div>
-              <div>No votes yet for this poll instance</div>
-            </div>
+              </GlassCard>
+            </motion.div>
           )}
-        </div>
 
-        {/* All Instances Management */}
-        {allInstances.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-8 mt-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">📋 All Instances</h2>
-            
-            <div className="space-y-4">
-              {allInstances.map((instance) => (
-                <div
-                  key={instance.instanceId}
-                  className={`border rounded-lg p-4 ${
-                    instance.status === 'Active' 
-                      ? 'border-green-300 bg-green-50' 
-                      : 'border-gray-300 bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          instance.status === 'Active'
-                            ? 'bg-green-600 text-white'
-                            : 'bg-gray-600 text-white'
-                        }`}>
-                          {instance.status}
-                        </span>
-                        <span className="font-mono text-sm text-gray-600">
-                          {instance.instanceId}
-                        </span>
-                      </div>
-                      
-                      <div className="grid md:grid-cols-2 gap-4 mt-3 text-sm">
-                        <div>
-                          <span className="text-gray-600">Start:</span>{' '}
-                          <span className="font-medium">{formatDate(instance.startDate)}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-600">End:</span>{' '}
-                          <span className="font-medium">{formatDate(instance.endDate)}</span>
-                        </div>
-                        {instance.closedAt && (
-                          <div className="md:col-span-2">
-                            <span className="text-gray-600">Closed:</span>{' '}
-                            <span className="font-medium text-red-600">{formatDate(instance.closedAt)}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-2 ml-4">
-                      <button
-                        onClick={() => {
-                          setSelectedInstanceId(instance.instanceId);
-                          loadResults(instance.instanceId);
-                        }}
-                        className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                      >
-                        📊 Results
-                      </button>
-                      
-                      {instance.status === 'Active' ? (
-                        <button
-                          onClick={() => manageInstance('close', instance.instanceId)}
-                          disabled={loadingAction}
-                          className="px-3 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 text-sm disabled:bg-gray-400"
-                        >
-                          ⏸️ Close
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => manageInstance('reopen', instance.instanceId)}
-                          disabled={loadingAction}
-                          className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm disabled:bg-gray-400"
-                        >
-                          ▶️ Reopen
-                        </button>
-                      )}
-                      
-                      <button
-                        onClick={() => manageInstance('delete', instance.instanceId)}
-                        disabled={loadingAction}
-                        className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm disabled:bg-gray-400"
-                      >
-                        🗑️ Delete
-                      </button>
-                    </div>
-                  </div>
+          {/* Results Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <GlassCard variant="elevated">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-[var(--foreground)] flex items-center gap-2">
+                  <span>📊</span>
+                  Results
+                </h2>
+                {activeInstance && (
+                  <Button
+                    onClick={() => loadResults(selectedInstanceId)}
+                    variant="primary"
+                  >
+                    🔄 Refresh Results
+                  </Button>
+                )}
+              </div>
+
+              {loadingResults ? (
+                <div className="text-center py-12">
+                  <motion.div
+                    className="inline-block w-12 h-12 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  />
+                  <p className="mt-4 text-[var(--foreground-secondary)]">Loading results...</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              ) : results && results.totalVotes > 0 && Array.isArray(results.results) ? (
+                <div className="space-y-4">
+                  <div className="mb-4 text-sm text-[var(--foreground-secondary)]">
+                    Total Votes: <span className="font-bold text-[var(--foreground)]">{results.totalVotes}</span>
+                  </div>
+                  
+                  {results.results.map((result, index) => (
+                    <motion.div
+                      key={result.optionId}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="glass rounded-lg p-4 border-2 border-transparent hover:border-[var(--accent-primary)] transition-base"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          <span className="w-8 h-8 rounded-full bg-[var(--accent-primary)] text-white flex items-center justify-center text-sm font-bold mr-3">
+                            {index + 1}
+                          </span>
+                          <span className="font-medium text-[var(--foreground)]">{result.optionText}</span>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-[var(--accent-primary)]">{result.votes}</div>
+                          <div className="text-sm text-[var(--foreground-muted)]">{result.percentage.toFixed(1)}%</div>
+                        </div>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="w-full glass rounded-full h-3 mt-3 overflow-hidden">
+                        <motion.div
+                          className="h-3 rounded-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${result.percentage}%` }}
+                          transition={{ duration: 0.8, ease: 'easeOut', delay: index * 0.1 + 0.2 }}
+                        />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-[var(--foreground-muted)]">
+                  <div className="text-6xl mb-4">📭</div>
+                  <div>No votes yet for this poll instance</div>
+                </div>
+              )}
+            </GlassCard>
+          </motion.div>
 
-        {/* Messages */}
-        {message && (
-          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-            {message}
-          </div>
-        )}
+          {/* All Instances Management */}
+          {allInstances.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <GlassCard variant="elevated" className="mt-6">
+                <h2 className="text-2xl font-bold text-[var(--foreground)] mb-6 flex items-center gap-2">
+                  <span>📋</span>
+                  All Instances
+                </h2>
+                
+                <div className="space-y-4">
+                  {allInstances.map((instance, index) => (
+                    <motion.div
+                      key={instance.instanceId}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + index * 0.05 }}
+                      className={`glass rounded-lg p-4 border-2 ${
+                        instance.status === 'Active' 
+                          ? 'border-[var(--success)] bg-[var(--success-light)]' 
+                          : 'border-[var(--glass-border)]'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                              instance.status === 'Active'
+                                ? 'bg-[var(--success)] text-white'
+                                : 'glass text-[var(--foreground-muted)] border border-[var(--glass-border)]'
+                            }`}>
+                              {instance.status}
+                            </span>
+                            <span className="font-mono text-sm text-[var(--foreground-muted)]">
+                              {instance.instanceId}
+                            </span>
+                          </div>
+                          
+                          <div className="grid md:grid-cols-2 gap-4 mt-3 text-sm">
+                            <div>
+                              <span className="text-[var(--foreground-muted)]">Start:</span>{' '}
+                              <span className="font-medium text-[var(--foreground)]">{formatDate(instance.startDate)}</span>
+                            </div>
+                            <div>
+                              <span className="text-[var(--foreground-muted)]">End:</span>{' '}
+                              <span className="font-medium text-[var(--foreground)]">{formatDate(instance.endDate)}</span>
+                            </div>
+                            {instance.closedAt && (
+                              <div className="md:col-span-2">
+                                <span className="text-[var(--foreground-muted)]">Closed:</span>{' '}
+                                <span className="font-medium text-[var(--error)]">{formatDate(instance.closedAt)}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 shrink-0">
+                          <Button
+                            onClick={() => {
+                              setSelectedInstanceId(instance.instanceId);
+                              loadResults(instance.instanceId);
+                            }}
+                            variant="secondary"
+                            className="text-sm"
+                          >
+                            📊 Results
+                          </Button>
+                          
+                          {instance.status === 'Active' ? (
+                            <Button
+                              onClick={() => manageInstance('close', instance.instanceId)}
+                              disabled={loadingAction}
+                              variant="secondary"
+                              className="text-sm"
+                            >
+                              ⏸️ Close
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={() => manageInstance('reopen', instance.instanceId)}
+                              disabled={loadingAction}
+                              variant="primary"
+                              className="text-sm"
+                            >
+                              ▶️ Reopen
+                            </Button>
+                          )}
+                          
+                          <Button
+                            onClick={() => manageInstance('delete', instance.instanceId)}
+                            disabled={loadingAction}
+                            variant="danger"
+                            className="text-sm"
+                          >
+                            🗑️ Delete
+                          </Button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </GlassCard>
+            </motion.div>
+          )}
 
-        {error && !loading && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-            {error}
-          </div>
-        )}
+          {/* Messages */}
+          <AnimatePresence>
+            {message && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="mt-6"
+              >
+                <GlassCard className="border-2 border-[var(--success)] bg-[var(--success-light)]">
+                  <div className="flex items-center gap-2 text-[var(--success)]">
+                    <span className="text-xl">✅</span>
+                    <span>{message}</span>
+                  </div>
+                </GlassCard>
+              </motion.div>
+            )}
 
-        {/* Action Buttons */}
-        <div className="mt-6 flex gap-4">
-          <Link
-            href={`/vote?pollId=${pollId}`}
-            target="_blank"
-            className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center font-medium"
+            {error && !loading && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="mt-6"
+              >
+                <GlassCard className="border-2 border-[var(--error)] bg-[var(--error-light)]">
+                  <div className="flex items-center gap-2 text-[var(--error)]">
+                    <span className="text-xl">⚠️</span>
+                    <span>{error}</span>
+                  </div>
+                </GlassCard>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Action Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mt-6 grid md:grid-cols-2 gap-4"
           >
-            👁️ Preview Voting Page
-          </Link>
-          <Link
-            href={`/admin/polls/${pollId}/keys`}
-            className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 text-center font-medium"
-          >
-            🔑 Manage Access Keys
-          </Link>
+            <Link
+              href={`/vote?pollId=${pollId}`}
+              target="_blank"
+            >
+              <Button variant="secondary" className="w-full py-4 text-lg">
+                👁️ Preview Voting Page
+              </Button>
+            </Link>
+            <Link href={`/admin/polls/${pollId}/keys`}>
+              <Button variant="primary" className="w-full py-4 text-lg">
+                🔑 Manage Access Keys
+              </Button>
+            </Link>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

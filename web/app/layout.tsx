@@ -1,10 +1,8 @@
-import type { Metadata } from "next";
-import "./globals.css";
+'use client';
 
-export const metadata: Metadata = {
-  title: "Poll System",
-  description: "Serverless poll system with AWS and Vercel",
-};
+import type { Metadata } from "next";
+import { MotionConfig } from "framer-motion";
+import "./globals.css";
 
 export default function RootLayout({
   children,
@@ -12,9 +10,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#2563EB" />
+      </head>
       <body className="antialiased">
-        {children}
+        <MotionConfig reducedMotion="user">
+          {children}
+        </MotionConfig>
       </body>
     </html>
   );

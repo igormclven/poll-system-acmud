@@ -1,54 +1,108 @@
-import Link from 'next/link';
+'use client';
+
+import { useEffect } from 'react';
+import { motion } from 'framer-motion';
+import AnimatedBackground from './components/AnimatedBackground';
+import GlassCard from './components/GlassCard';
 
 export default function Home() {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.location.href = 'https://acmud.org';
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold text-gray-900 mb-4">
-            Poll System
-          </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            Create, manage, and participate in polls with ease
-          </p>
+    <>
+      <AnimatedBackground />
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-1 container mx-auto px-4 py-16 flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.6,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+          >
+            <GlassCard variant="elevated" className="text-center max-w-2xl">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{
+                  delay: 0.2,
+                  duration: 0.5,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+              >
+                <motion.h1 
+                  className="text-6xl md:text-7xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]"
+                  animate={{
+                    backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
+                  style={{
+                    backgroundSize: '200% auto',
+                  }}
+                >
+                  Poll System
+                </motion.h1>
+                
+                <motion.p
+                  className="text-2xl text-[var(--foreground-secondary)] mb-8 font-medium"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                >
+                  ACM UD
+                </motion.p>
+
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.5 }}
+                  className="flex items-center justify-center gap-2"
+                >
+                  <motion.div
+                    className="w-2 h-2 rounded-full bg-[var(--accent-primary)]"
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [1, 0.5, 1],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                  />
+                  <p className="text-sm text-[var(--foreground-muted)]">
+                    Redirigiendo a acmud.org...
+                  </p>
+                </motion.div>
+              </motion.div>
+            </GlassCard>
+          </motion.div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow">
-            <div className="text-4xl mb-4">📊</div>
-            <h2 className="text-2xl font-bold mb-4 text-gray-900">Vote in a Poll</h2>
-            <p className="text-gray-600 mb-6">
-              Have a voting link? Use your unique access key to participate in polls.
+        <motion.footer
+          className="w-full py-6 text-center glass-border"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+        >
+          <div className="glass inline-block px-6 py-3 rounded-full">
+            <p className="text-sm text-[var(--foreground-secondary)]">
+              © 2025 ACM UD
             </p>
-            <Link
-              href="/vote"
-              className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Go to Voting
-            </Link>
           </div>
-
-          <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow">
-            <div className="text-4xl mb-4">🔐</div>
-            <h2 className="text-2xl font-bold mb-4 text-gray-900">Admin Dashboard</h2>
-            <p className="text-gray-600 mb-6">
-              Create polls, manage access keys, and view results.
-            </p>
-            <Link
-              href="/admin"
-              className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              Admin Login
-            </Link>
-          </div>
-        </div>
-
-        <div className="mt-16 text-center text-gray-500">
-          <p className="text-sm">
-            Serverless Poll System • Built with Next.js, AWS Lambda, and DynamoDB
-          </p>
-        </div>
+        </motion.footer>
       </div>
-    </div>
+    </>
   );
 }

@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import AnimatedBackground from '../../components/AnimatedBackground';
+import GlassCard from '../../components/GlassCard';
+import Button from '../../components/Button';
 
 interface Suggestion {
   id: string;
@@ -75,108 +79,160 @@ export default function SuggestionsPage() {
   const approvedSuggestions = suggestions.filter(s => s.status === 'Approved');
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6">
-          <Link href="/admin" className="text-indigo-600 hover:text-indigo-800 text-sm">
-            ← Back to Dashboard
-          </Link>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Manage Suggestions</h1>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select Poll
-            </label>
-            <select
-              value={selectedPoll}
-              onChange={(e) => setSelectedPoll(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+    <>
+      <AnimatedBackground />
+      <div className="min-h-screen py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="mb-6"
+          >
+            <Link 
+              href="/admin" 
+              className="text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)] text-sm font-medium inline-flex items-center gap-2 transition-colors"
             >
-              {polls.map((poll) => (
-                <option key={poll.id} value={poll.id}>
-                  {poll.title}
-                </option>
-              ))}
-            </select>
-          </div>
+              <span>←</span>
+              <span>Back to Dashboard</span>
+            </Link>
+          </motion.div>
 
-          {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading suggestions...</div>
-          ) : (
-            <div className="space-y-8">
-              {/* Pending Suggestions */}
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
-                  Pending Suggestions ({pendingSuggestions.length})
-                </h2>
-                {pendingSuggestions.length === 0 ? (
-                  <div className="text-gray-500 text-sm">No pending suggestions</div>
-                ) : (
-                  <div className="space-y-3">
-                    {pendingSuggestions.map((suggestion) => (
-                      <div
-                        key={suggestion.id}
-                        className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <p className="text-gray-900 font-medium">{suggestion.text}</p>
-                            <p className="text-xs text-gray-500 mt-1">
-                              Submitted: {new Date(suggestion.createdAt).toLocaleString()}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <GlassCard variant="elevated">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-4xl">💡</span>
+                <h1 className="text-3xl font-bold text-[var(--foreground)]">Manage Suggestions</h1>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-[var(--foreground-secondary)] mb-2">
+                  Select Poll
+                </label>
+                <select
+                  value={selectedPoll}
+                  onChange={(e) => setSelectedPoll(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg glass border-2 border-transparent focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)] text-[var(--foreground)] transition-base"
+                >
+                  {polls.map((poll) => (
+                    <option key={poll.id} value={poll.id}>
+                      {poll.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {loading ? (
+                <div className="text-center py-12">
+                  <motion.div
+                    className="inline-block w-16 h-16 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  />
+                  <p className="mt-4 text-[var(--foreground-secondary)]">Loading suggestions...</p>
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  {/* Pending Suggestions */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                      <span className="text-yellow-500">⏳</span>
+                      Pending Suggestions ({pendingSuggestions.length})
+                    </h2>
+                    {pendingSuggestions.length === 0 ? (
+                      <div className="text-[var(--foreground-muted)] text-sm p-6 glass rounded-lg text-center">
+                        No pending suggestions
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <AnimatePresence>
+                          {pendingSuggestions.map((suggestion, index) => (
+                            <motion.div
+                              key={suggestion.id}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: 20 }}
+                              transition={{ delay: index * 0.05 }}
+                              className="p-4 glass rounded-lg border-2 border-transparent hover:border-[var(--accent-primary)] transition-base"
+                            >
+                              <div className="flex justify-between items-start gap-4">
+                                <div className="flex-1">
+                                  <p className="text-[var(--foreground)] font-medium mb-2">{suggestion.text}</p>
+                                  <p className="text-xs text-[var(--foreground-muted)]">
+                                    Submitted: {new Date(suggestion.createdAt).toLocaleString()}
+                                  </p>
+                                </div>
+                                <div className="flex gap-2 shrink-0">
+                                  <Button
+                                    onClick={() => updateSuggestionStatus(suggestion.id, 'Approved')}
+                                    variant="primary"
+                                    className="text-sm"
+                                  >
+                                    ✓ Approve
+                                  </Button>
+                                  <Button
+                                    onClick={() => updateSuggestionStatus(suggestion.id, 'Rejected')}
+                                    variant="danger"
+                                    className="text-sm"
+                                  >
+                                    ✕ Reject
+                                  </Button>
+                                </div>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </AnimatePresence>
+                      </div>
+                    )}
+                  </motion.div>
+
+                  {/* Approved Suggestions */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      Approved Suggestions ({approvedSuggestions.length})
+                    </h2>
+                    {approvedSuggestions.length === 0 ? (
+                      <div className="text-[var(--foreground-muted)] text-sm p-6 glass rounded-lg text-center">
+                        No approved suggestions
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {approvedSuggestions.map((suggestion, index) => (
+                          <motion.div
+                            key={suggestion.id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3 + index * 0.05 }}
+                            className="p-4 glass rounded-lg border-2 border-[var(--success)] bg-[var(--success-light)]"
+                          >
+                            <p className="text-[var(--foreground)] font-medium mb-1">{suggestion.text}</p>
+                            <p className="text-xs text-[var(--foreground-muted)]">
+                              Will be added to next poll instance
                             </p>
-                          </div>
-                          <div className="flex gap-2 ml-4">
-                            <button
-                              onClick={() => updateSuggestionStatus(suggestion.id, 'Approved')}
-                              className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
-                            >
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => updateSuggestionStatus(suggestion.id, 'Rejected')}
-                              className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-                            >
-                              Reject
-                            </button>
-                          </div>
-                        </div>
+                          </motion.div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Approved Suggestions */}
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
-                  Approved Suggestions ({approvedSuggestions.length})
-                </h2>
-                {approvedSuggestions.length === 0 ? (
-                  <div className="text-gray-500 text-sm">No approved suggestions</div>
-                ) : (
-                  <div className="space-y-2">
-                    {approvedSuggestions.map((suggestion) => (
-                      <div
-                        key={suggestion.id}
-                        className="p-3 border border-green-200 bg-green-50 rounded-lg"
-                      >
-                        <p className="text-gray-900">{suggestion.text}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Will be added to next poll instance
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+                    )}
+                  </motion.div>
+                </div>
+              )}
+            </GlassCard>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

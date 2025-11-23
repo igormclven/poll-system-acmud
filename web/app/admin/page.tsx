@@ -3,6 +3,11 @@
 import { useEffect, useState } from 'react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import AnimatedBackground from '../components/AnimatedBackground';
+import GlassCard from '../components/GlassCard';
+import Button from '../components/Button';
+import { Input, TextArea } from '../components/Input';
 
 interface Poll {
   id: string;
@@ -35,68 +40,129 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-sm text-gray-600">Manage your polls and view results</p>
+    <>
+      <AnimatedBackground />
+      <div className="min-h-screen">
+        {/* Header */}
+        <motion.header
+          className="sticky top-0 z-50 glass-heavy border-b border-[var(--glass-border)]"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold text-[var(--foreground)]">
+                  Dashboard
+                </h1>
+                <p className="text-sm text-[var(--foreground-secondary)]">
+                  Manage your polls and view results
+                </p>
+              </div>
+              <Button
+                variant="danger"
+                onClick={() => signOut({ callbackUrl: '/' })}
+              >
+                Sign Out
+              </Button>
             </div>
-            <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+          </div>
+        </motion.header>
+
+        <div className="container mx-auto px-4 py-8">
+          {/* Action Buttons */}
+          <motion.div
+            className="mb-8 flex gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+          >
+            <Button
+              variant="primary"
+              onClick={() => setShowCreateForm(!showCreateForm)}
             >
-              Sign Out
-            </button>
-          </div>
+              {showCreateForm ? '✕ Cancel' : '+ Create New Poll'}
+            </Button>
+            <Link href="/admin/suggestions">
+              <Button variant="secondary">
+                💡 Manage Suggestions
+              </Button>
+            </Link>
+          </motion.div>
+
+          {/* Create Poll Form */}
+          <AnimatePresence>
+            {showCreateForm && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                animate={{ opacity: 1, height: 'auto', marginBottom: 32 }}
+                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <GlassCard variant="elevated">
+                  <h2 className="text-2xl font-bold text-[var(--foreground)] mb-6">
+                    Create New Poll
+                  </h2>
+                  <CreatePollForm onSuccess={() => { setShowCreateForm(false); loadPolls(); }} />
+                </GlassCard>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Polls List */}
+          {loading ? (
+            <div className="text-center py-12">
+              <motion.div
+                className="inline-block w-16 h-16 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+              />
+              <p className="mt-4 text-[var(--foreground-secondary)]">Loading polls...</p>
+            </div>
+          ) : polls.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+            >
+              <GlassCard variant="elevated" className="text-center py-12">
+                <div className="text-6xl mb-4">📊</div>
+                <p className="text-xl text-[var(--foreground-secondary)]">
+                  No polls yet. Create your first poll!
+                </p>
+              </GlassCard>
+            </motion.div>
+          ) : (
+            <motion.div
+              className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.1,
+                  },
+                },
+              }}
+            >
+              {polls.map((poll, index) => (
+                <motion.div
+                  key={poll.id}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <PollCard poll={poll} />
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
         </div>
       </div>
-
-      <div className="container mx-auto px-4 py-8">
-        {/* Action Buttons */}
-        <div className="mb-8 flex gap-4">
-          <button
-            onClick={() => setShowCreateForm(!showCreateForm)}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
-          >
-            {showCreateForm ? 'Cancel' : '+ Create New Poll'}
-          </button>
-          <Link
-            href="/admin/suggestions"
-            className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
-          >
-            Manage Suggestions
-          </Link>
-        </div>
-
-        {/* Create Poll Form */}
-        {showCreateForm && (
-          <div className="mb-8 bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold mb-4">Create New Poll</h2>
-            <CreatePollForm onSuccess={() => { setShowCreateForm(false); loadPolls(); }} />
-          </div>
-        )}
-
-        {/* Polls List */}
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="text-gray-500">Loading polls...</div>
-          </div>
-        ) : polls.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-gray-500">No polls yet. Create your first poll!</div>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {polls.map((poll) => (
-              <PollCard key={poll.id} poll={poll} />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+    </>
   );
 }
 
@@ -113,7 +179,6 @@ function CreatePollForm({ onSuccess }: { onSuccess: () => void }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Update duration when recurrence type changes
   const handleRecurrenceTypeChange = (type: typeof recurrenceType) => {
     setRecurrenceType(type);
     if (type === 'WEEKLY') setDurationDays(7);
@@ -145,7 +210,6 @@ function CreatePollForm({ onSuccess }: { onSuccess: () => void }) {
         allowSuggestions,
       };
 
-      // Add optional fields if provided
       if (startDate) {
         payload.startDate = new Date(startDate).toISOString();
       }
@@ -174,219 +238,227 @@ function CreatePollForm({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <Input
+        label="Title"
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        required
+        placeholder="Enter poll title"
+      />
+
+      <TextArea
+        label="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        rows={3}
+        placeholder="Enter poll description (optional)"
+      />
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Options</label>
-        {options.map((option, index) => (
-          <div key={index} className="flex gap-2 mb-2">
-            <input
-              type="text"
-              value={option}
-              onChange={(e) => updateOption(index, e.target.value)}
-              placeholder={`Option ${index + 1}`}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-            />
-            {options.length > 2 && (
-              <button
-                type="button"
-                onClick={() => removeOption(index)}
-                className="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-        ))}
+        <label className="block text-sm font-medium text-[var(--foreground-secondary)] mb-3">
+          Options
+        </label>
+        <div className="space-y-2">
+          {options.map((option, index) => (
+            <motion.div
+              key={index}
+              className="flex gap-2"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <input
+                type="text"
+                value={option}
+                onChange={(e) => updateOption(index, e.target.value)}
+                placeholder={`Option ${index + 1}`}
+                className="flex-1 px-4 py-3 rounded-lg glass border-2 border-transparent focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)] text-[var(--foreground)] placeholder:text-[var(--foreground-muted)] transition-base"
+              />
+              {options.length > 2 && (
+                <Button
+                  type="button"
+                  variant="danger"
+                  onClick={() => removeOption(index)}
+                >
+                  ✕
+                </Button>
+              )}
+            </motion.div>
+          ))}
+        </div>
         <button
           type="button"
           onClick={addOption}
-          className="text-sm text-indigo-600 hover:text-indigo-800"
+          className="mt-3 text-sm text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)] transition-colors"
         >
           + Add option
         </button>
       </div>
 
-      {/* Poll Type and Duration */}
-      <div className="border-t pt-4">
-        <h3 className="text-md font-semibold text-gray-800 mb-3">Poll Configuration</h3>
+      {/* Poll Configuration */}
+      <div className="glass rounded-lg p-6 space-y-4">
+        <h3 className="text-lg font-semibold text-[var(--foreground)]">Poll Configuration</h3>
         
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="flex items-center mb-3">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={isRecurring}
                 onChange={(e) => setIsRecurring(e.target.checked)}
-                className="mr-2 w-4 h-4"
+                className="w-5 h-5 rounded border-2 border-[var(--glass-border)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
               />
-              <span className="text-sm text-gray-700 font-medium">Recurring Poll</span>
+              <span className="text-sm text-[var(--foreground)] font-medium">Recurring Poll</span>
             </label>
 
             {isRecurring && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Recurrence Type
-                </label>
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="mt-3"
+              >
                 <select
                   value={recurrenceType}
                   onChange={(e) => handleRecurrenceTypeChange(e.target.value as typeof recurrenceType)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 rounded-lg glass border-2 border-transparent focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)] text-[var(--foreground)] transition-base"
                 >
                   <option value="WEEKLY">Weekly (7 days)</option>
                   <option value="BIWEEKLY">Biweekly (14 days)</option>
                   <option value="MONTHLY">Monthly (30 days)</option>
                   <option value="CUSTOM">Custom duration</option>
                 </select>
-              </div>
+              </motion.div>
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Duration (days)
-            </label>
-            <input
-              type="number"
-              value={durationDays}
-              onChange={(e) => setDurationDays(Number(e.target.value))}
-              min="1"
-              max="365"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              How many days the poll will be active
-            </p>
-          </div>
+          <Input
+            label="Duration (days)"
+            type="number"
+            value={durationDays}
+            onChange={(e) => setDurationDays(Number(e.target.value))}
+            min="1"
+            max="365"
+          />
         </div>
       </div>
 
-      {/* Dates */}
-      <div className="border-t pt-4">
-        <h3 className="text-md font-semibold text-gray-800 mb-3">Schedule (Optional)</h3>
+      {/* Schedule */}
+      <div className="glass rounded-lg p-6 space-y-4">
+        <h3 className="text-lg font-semibold text-[var(--foreground)]">Schedule (Optional)</h3>
         
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-[var(--foreground-secondary)] mb-2">
               Start Date
             </label>
             <input
               type="datetime-local"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 rounded-lg glass border-2 border-transparent focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)] text-[var(--foreground)] transition-base"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Leave empty to start immediately
-            </p>
           </div>
 
           {isRecurring && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[var(--foreground-secondary)] mb-2">
                 End Date (Recurring Only)
               </label>
               <input
                 type="datetime-local"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 rounded-lg glass border-2 border-transparent focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)] text-[var(--foreground)] transition-base"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                When to stop creating new instances
-              </p>
             </div>
           )}
         </div>
       </div>
 
       {/* Other Options */}
-      <div className="border-t pt-4">
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            checked={allowSuggestions}
-            onChange={(e) => setAllowSuggestions(e.target.checked)}
-            className="mr-2 w-4 h-4"
-          />
-          <span className="text-sm text-gray-700">Allow user suggestions</span>
-        </label>
-      </div>
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={allowSuggestions}
+          onChange={(e) => setAllowSuggestions(e.target.checked)}
+          className="w-5 h-5 rounded border-2 border-[var(--glass-border)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+        />
+        <span className="text-sm text-[var(--foreground)]">Allow user suggestions</span>
+      </label>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="p-4 rounded-lg bg-[var(--error-light)] border border-[var(--error)] text-[var(--error)]"
+        >
           {error}
-        </div>
+        </motion.div>
       )}
 
-      <button
+      <Button
         type="submit"
-        disabled={loading}
-        className="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 font-medium"
+        variant="primary"
+        loading={loading}
+        className="w-full py-4 text-lg"
       >
-        {loading ? 'Creating...' : 'Create Poll'}
-      </button>
+        Create Poll
+      </Button>
     </form>
   );
 }
 
 function PollCard({ poll }: { poll: Poll }) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+    <GlassCard variant="interactive">
       <div className="flex justify-between items-start mb-3">
-        <h3 className="text-lg font-bold text-gray-900">{poll.title}</h3>
+        <h3 className="text-xl font-bold text-[var(--foreground)] line-clamp-2">
+          {poll.title}
+        </h3>
         {poll.isRecurring && (
-          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Recurring</span>
+          <motion.span
+            className="text-xs bg-[var(--accent-primary)] text-white px-3 py-1 rounded-full font-medium"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+          >
+            🔄 Recurring
+          </motion.span>
         )}
       </div>
 
       {poll.description && (
-        <p className="text-sm text-gray-600 mb-4">{poll.description}</p>
+        <p className="text-sm text-[var(--foreground-secondary)] mb-4 line-clamp-2">
+          {poll.description}
+        </p>
       )}
 
-      <div className="flex gap-2 text-xs text-gray-500 mb-4">
-        {poll.allowSuggestions && <span>✓ Suggestions enabled</span>}
+      <div className="flex gap-2 text-xs text-[var(--foreground-muted)] mb-4">
+        {poll.allowSuggestions && (
+          <span className="flex items-center gap-1">
+            <span className="text-green-500">✓</span> Suggestions
+          </span>
+        )}
       </div>
 
       <div className="flex gap-2">
-        <Link
-          href={`/admin/polls/${poll.id}`}
-          className="flex-1 text-center px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 text-sm font-medium"
-        >
-          Manage
+        <Link href={`/admin/polls/${poll.id}`} className="flex-1">
+          <Button variant="primary" className="w-full">
+            Manage
+          </Button>
         </Link>
-        <Link
-          href={`/admin/polls/${poll.id}/keys`}
-          className="flex-1 text-center px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 text-sm font-medium"
-        >
-          Access Keys
+        <Link href={`/admin/polls/${poll.id}/keys`} className="flex-1">
+          <Button variant="secondary" className="w-full">
+            🔑 Keys
+          </Button>
         </Link>
       </div>
 
-      <div className="mt-3 text-xs text-gray-400">
+      <div className="mt-3 text-xs text-[var(--foreground-muted)]">
         Created: {new Date(poll.createdAt).toLocaleDateString()}
       </div>
-    </div>
+    </GlassCard>
   );
 }
-

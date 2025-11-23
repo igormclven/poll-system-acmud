@@ -1,20 +1,66 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import AnimatedBackground from '../../components/AnimatedBackground';
+import GlassCard from '../../components/GlassCard';
+import Button from '../../components/Button';
+
 export default function AuthError() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
-        <div className="text-6xl mb-4">⚠️</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Authentication Error</h1>
-        <p className="text-gray-600 mb-6">
-          There was a problem signing you in. Please try again.
-        </p>
-        <a
-          href="/auth/signin"
-          className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+    <>
+      <AnimatedBackground />
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-md w-full"
         >
-          Try Again
-        </a>
+          <GlassCard variant="elevated" className="text-center">
+            <motion.div
+              className="text-7xl mb-6"
+              animate={{
+                rotate: [0, -10, 10, -10, 0],
+                scale: [1, 1.1, 1.1, 1.1, 1],
+              }}
+              transition={{
+                duration: 0.6,
+                times: [0, 0.2, 0.4, 0.6, 1],
+              }}
+            >
+              ⚠️
+            </motion.div>
+            <motion.h1
+              className="text-3xl font-bold text-[var(--foreground)] mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              Authentication Error
+            </motion.h1>
+            <motion.p
+              className="text-[var(--foreground-secondary)] mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              There was a problem signing you in. Please try again.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <a href="/auth/signin">
+                <Button variant="primary" className="w-full py-3 text-lg">
+                  Try Again
+                </Button>
+              </a>
+            </motion.div>
+          </GlassCard>
+        </motion.div>
       </div>
-    </div>
+    </>
   );
 }
 

@@ -2,6 +2,11 @@
 
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import AnimatedBackground from '../../../../components/AnimatedBackground';
+import GlassCard from '../../../../components/GlassCard';
+import Button from '../../../../components/Button';
+import { Input } from '../../../../components/Input';
 
 export default function PollKeysPage({ params }: { params: Promise<{ pollId: string }> }) {
   const { pollId } = use(params);
@@ -66,108 +71,129 @@ export default function PollKeysPage({ params }: { params: Promise<{ pollId: str
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <Link href="/admin" className="text-indigo-600 hover:text-indigo-800 text-sm">
-            ← Back to Dashboard
-          </Link>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Generate Access Keys</h1>
-
-          <div className="grid md:grid-cols-3 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Number of Keys
-              </label>
-              <input
-                type="number"
-                value={count}
-                onChange={(e) => setCount(Number(e.target.value))}
-                min="1"
-                max="1000"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Max Uses per Key
-              </label>
-              <input
-                type="number"
-                value={maxUses}
-                onChange={(e) => setMaxUses(Number(e.target.value))}
-                min="1"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Expiry (Days)
-              </label>
-              <input
-                type="number"
-                value={expiryDays}
-                onChange={(e) => setExpiryDays(Number(e.target.value))}
-                min="1"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={generateKeys}
-            disabled={loading}
-            className="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 font-medium mb-6"
+    <>
+      <AnimatedBackground />
+      <div className="min-h-screen py-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="mb-6"
           >
-            {loading ? 'Generating...' : 'Generate Keys'}
-          </button>
+            <Link 
+              href="/admin" 
+              className="text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)] text-sm font-medium inline-flex items-center gap-2 transition-colors"
+            >
+              <span>←</span>
+              <span>Back to Dashboard</span>
+            </Link>
+          </motion.div>
 
-          {message && (
-            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700">
-              {message}
-            </div>
-          )}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <GlassCard variant="elevated">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-4xl">🔑</span>
+                <h1 className="text-3xl font-bold text-[var(--foreground)]">Generate Access Keys</h1>
+              </div>
 
-          {keys.length > 0 && (
-            <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-900">Generated Keys</h2>
-                <button
-                  onClick={exportKeys}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
+              <div className="grid md:grid-cols-3 gap-4 mb-6">
+                <Input
+                  label="Number of Keys"
+                  type="number"
+                  value={count}
+                  onChange={(e) => setCount(Number(e.target.value))}
+                  min="1"
+                  max="1000"
+                />
+
+                <Input
+                  label="Max Uses per Key"
+                  type="number"
+                  value={maxUses}
+                  onChange={(e) => setMaxUses(Number(e.target.value))}
+                  min="1"
+                />
+
+                <Input
+                  label="Expiry (Days)"
+                  type="number"
+                  value={expiryDays}
+                  onChange={(e) => setExpiryDays(Number(e.target.value))}
+                  min="1"
+                />
+              </div>
+
+              <Button
+                onClick={generateKeys}
+                loading={loading}
+                variant="primary"
+                className="w-full py-4 text-lg mb-6"
+              >
+                Generate Keys
+              </Button>
+
+              {message && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="mb-6 p-4 glass rounded-lg border-2 border-[var(--accent-primary)] bg-[var(--accent-primary-light)] text-[var(--accent-primary)]"
                 >
-                  Export CSV
-                </button>
-              </div>
+                  {message}
+                </motion.div>
+              )}
 
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {keys.map((key) => (
-                  <div
-                    key={key.keyId}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
-                  >
-                    <div className="flex-1 font-mono text-sm text-gray-700">
-                      {key.keyId}
-                    </div>
-                    <button
-                      onClick={() => copyToClipboard(key.keyId)}
-                      className="ml-4 px-3 py-1 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 text-sm"
+              {keys.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-[var(--foreground)] flex items-center gap-2">
+                      <span>📋</span>
+                      Generated Keys ({keys.length})
+                    </h2>
+                    <Button
+                      onClick={exportKeys}
+                      variant="secondary"
                     >
-                      Copy URL
-                    </button>
+                      📥 Export CSV
+                    </Button>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
+
+                  <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                    {keys.map((key, index) => (
+                      <motion.div
+                        key={key.keyId}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="flex items-center justify-between p-4 glass rounded-lg hover:border-[var(--accent-primary)] border-2 border-transparent transition-base"
+                      >
+                        <div className="flex-1 font-mono text-sm text-[var(--foreground)] break-all pr-4">
+                          {key.keyId}
+                        </div>
+                        <Button
+                          onClick={() => copyToClipboard(key.keyId)}
+                          variant="ghost"
+                          className="shrink-0"
+                        >
+                          📋 Copy URL
+                        </Button>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </GlassCard>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
