@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FaLightbulb, FaCheck, FaTimes, FaClock } from 'react-icons/fa';
 import AnimatedBackground from '../../components/AnimatedBackground';
 import GlassCard from '../../components/GlassCard';
 import Button from '../../components/Button';
@@ -104,7 +105,7 @@ export default function SuggestionsPage() {
           >
             <GlassCard variant="elevated">
               <div className="flex items-center gap-3 mb-6">
-                <span className="text-4xl">💡</span>
+                <FaLightbulb className="text-4xl text-yellow-500" />
                 <h1 className="text-3xl font-bold text-[var(--foreground)]">Manage Suggestions</h1>
               </div>
 
@@ -143,7 +144,7 @@ export default function SuggestionsPage() {
                     transition={{ delay: 0.2 }}
                   >
                     <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
-                      <span className="text-yellow-500">⏳</span>
+                      <FaClock className="text-yellow-500" />
                       Pending Suggestions ({pendingSuggestions.length})
                     </h2>
                     {pendingSuggestions.length === 0 ? (
@@ -175,14 +176,14 @@ export default function SuggestionsPage() {
                                     variant="primary"
                                     className="text-sm"
                                   >
-                                    ✓ Approve
+                                    <FaCheck className="inline mr-1" /> Approve
                                   </Button>
                                   <Button
                                     onClick={() => updateSuggestionStatus(suggestion.id, 'Rejected')}
                                     variant="danger"
                                     className="text-sm"
                                   >
-                                    ✕ Reject
+                                    <FaTimes className="inline mr-1" /> Reject
                                   </Button>
                                 </div>
                               </div>
@@ -200,7 +201,7 @@ export default function SuggestionsPage() {
                     transition={{ delay: 0.3 }}
                   >
                     <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
-                      <span className="text-green-500">✓</span>
+                      <FaCheck className="text-green-500" />
                       Approved Suggestions ({approvedSuggestions.length})
                     </h2>
                     {approvedSuggestions.length === 0 ? (

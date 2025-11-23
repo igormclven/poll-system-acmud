@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { FaExclamationTriangle } from 'react-icons/fa';
 import AnimatedBackground from '../../components/AnimatedBackground';
 import GlassCard from '../../components/GlassCard';
 import Button from '../../components/Button';
@@ -18,7 +19,7 @@ export default function AuthError() {
         >
           <GlassCard variant="elevated" className="text-center">
             <motion.div
-              className="text-7xl mb-6"
+              className="text-7xl mb-6 flex justify-center"
               animate={{
                 rotate: [0, -10, 10, -10, 0],
                 scale: [1, 1.1, 1.1, 1.1, 1],
@@ -28,7 +29,7 @@ export default function AuthError() {
                 times: [0, 0.2, 0.4, 0.6, 1],
               }}
             >
-              ⚠️
+              <FaExclamationTriangle className="text-red-500" />
             </motion.div>
             <motion.h1
               className="text-3xl font-bold text-[var(--foreground)] mb-4"

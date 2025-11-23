@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { FaKey, FaClipboard, FaFileDownload, FaCheck, FaTimes } from 'react-icons/fa';
 import AnimatedBackground from '../../../../components/AnimatedBackground';
 import GlassCard from '../../../../components/GlassCard';
 import Button from '../../../../components/Button';
@@ -43,9 +44,9 @@ export default function PollKeysPage({ params }: { params: Promise<{ pollId: str
       }
 
       setKeys(data.keys);
-      setMessage(`✅ Successfully generated ${data.keys.length} access keys`);
+      setMessage(`Successfully generated ${data.keys.length} access keys`);
     } catch (error: any) {
-      setMessage(`❌ Error: ${error.message}`);
+      setMessage(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -54,7 +55,7 @@ export default function PollKeysPage({ params }: { params: Promise<{ pollId: str
   const copyToClipboard = (keyId: string) => {
     const url = `${window.location.origin}/vote?pollId=${pollId}&key=${keyId}`;
     navigator.clipboard.writeText(url);
-    setMessage('✅ Voting URL copied to clipboard!');
+    setMessage('Voting URL copied to clipboard!');
     setTimeout(() => setMessage(''), 3000);
   };
 
@@ -96,7 +97,7 @@ export default function PollKeysPage({ params }: { params: Promise<{ pollId: str
           >
             <GlassCard variant="elevated">
               <div className="flex items-center gap-3 mb-6">
-                <span className="text-4xl">🔑</span>
+                <FaKey className="text-4xl text-[var(--accent-primary)]" />
                 <h1 className="text-3xl font-bold text-[var(--foreground)]">Generate Access Keys</h1>
               </div>
 
@@ -154,14 +155,14 @@ export default function PollKeysPage({ params }: { params: Promise<{ pollId: str
                 >
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold text-[var(--foreground)] flex items-center gap-2">
-                      <span>📋</span>
+                      <FaClipboard />
                       Generated Keys ({keys.length})
                     </h2>
                     <Button
                       onClick={exportKeys}
                       variant="secondary"
                     >
-                      📥 Export CSV
+                      <FaFileDownload className="inline mr-2" /> Export CSV
                     </Button>
                   </div>
 
@@ -182,7 +183,7 @@ export default function PollKeysPage({ params }: { params: Promise<{ pollId: str
                           variant="ghost"
                           className="shrink-0"
                         >
-                          📋 Copy URL
+                          <FaClipboard className="inline mr-1" /> Copy URL
                         </Button>
                       </motion.div>
                     ))}

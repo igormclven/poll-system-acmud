@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FaTimes, FaLightbulb, FaChartBar, FaCheck, FaKey, FaRedo } from 'react-icons/fa';
 import AnimatedBackground from '../components/AnimatedBackground';
 import GlassCard from '../components/GlassCard';
 import Button from '../components/Button';
@@ -82,11 +83,11 @@ export default function AdminDashboard() {
               variant="primary"
               onClick={() => setShowCreateForm(!showCreateForm)}
             >
-              {showCreateForm ? '✕ Cancel' : '+ Create New Poll'}
+              {showCreateForm ? <><FaTimes className="inline mr-2" />Cancel</> : '+ Create New Poll'}
             </Button>
             <Link href="/admin/suggestions">
               <Button variant="secondary">
-                💡 Manage Suggestions
+                <FaLightbulb className="inline mr-2" /> Manage Suggestions
               </Button>
             </Link>
           </motion.div>
@@ -127,7 +128,7 @@ export default function AdminDashboard() {
               transition={{ duration: 0.4 }}
             >
               <GlassCard variant="elevated" className="text-center py-12">
-                <div className="text-6xl mb-4">📊</div>
+                <FaChartBar className="text-6xl mb-4 mx-auto text-[var(--foreground-secondary)]" />
                 <p className="text-xl text-[var(--foreground-secondary)]">
                   No polls yet. Create your first poll!
                 </p>
@@ -176,6 +177,7 @@ function CreatePollForm({ onSuccess }: { onSuccess: () => void }) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [allowSuggestions, setAllowSuggestions] = useState(false);
+  const [allowMultipleChoice, setAllowMultipleChoice] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -208,6 +210,7 @@ function CreatePollForm({ onSuccess }: { onSuccess: () => void }) {
         recurrenceType,
         durationDays,
         allowSuggestions,
+        allowMultipleChoice,
       };
 
       if (startDate) {
@@ -282,7 +285,7 @@ function CreatePollForm({ onSuccess }: { onSuccess: () => void }) {
                   variant="danger"
                   onClick={() => removeOption(index)}
                 >
-                  ✕
+                  <FaTimes />
                 </Button>
               )}
             </motion.div>
@@ -378,15 +381,39 @@ function CreatePollForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
 
       {/* Other Options */}
-      <label className="flex items-center gap-2 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={allowSuggestions}
-          onChange={(e) => setAllowSuggestions(e.target.checked)}
-          className="w-5 h-5 rounded border-2 border-[var(--glass-border)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
-        />
-        <span className="text-sm text-[var(--foreground)]">Allow user suggestions</span>
-      </label>
+      <div className="glass rounded-lg p-6 space-y-4">
+        <h3 className="text-lg font-semibold text-[var(--foreground)]">Voting Options</h3>
+        
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={allowMultipleChoice}
+            onChange={(e) => setAllowMultipleChoice(e.target.checked)}
+            className="w-5 h-5 rounded border-2 border-[var(--glass-border)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+          />
+          <span className="text-sm text-[var(--foreground)] font-medium">Allow multiple choice selection</span>
+        </label>
+        {allowMultipleChoice && (
+          <p className="text-xs text-[var(--foreground-secondary)] ml-7">
+            Voters will be able to select multiple options using checkboxes
+          </p>
+        )}
+        
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={allowSuggestions}
+            onChange={(e) => setAllowSuggestions(e.target.checked)}
+            className="w-5 h-5 rounded border-2 border-[var(--glass-border)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+          />
+          <span className="text-sm text-[var(--foreground)] font-medium">Allow user suggestions</span>
+        </label>
+        {allowSuggestions && (
+          <p className="text-xs text-[var(--foreground-secondary)] ml-7">
+            Users can submit new option suggestions for future polls
+          </p>
+        )}
+      </div>
 
       {error && (
         <motion.div
@@ -419,12 +446,12 @@ function PollCard({ poll }: { poll: Poll }) {
         </h3>
         {poll.isRecurring && (
           <motion.span
-            className="text-xs bg-[var(--accent-primary)] text-white px-3 py-1 rounded-full font-medium"
+            className="text-xs bg-[var(--accent-primary)] text-white px-3 py-1 rounded-full font-medium flex items-center gap-1"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 500, damping: 25 }}
           >
-            🔄 Recurring
+            <FaRedo className="text-xs" /> Recurring
           </motion.span>
         )}
       </div>
@@ -438,7 +465,7 @@ function PollCard({ poll }: { poll: Poll }) {
       <div className="flex gap-2 text-xs text-[var(--foreground-muted)] mb-4">
         {poll.allowSuggestions && (
           <span className="flex items-center gap-1">
-            <span className="text-green-500">✓</span> Suggestions
+            <FaCheck className="text-green-500" /> Suggestions
           </span>
         )}
       </div>
@@ -451,7 +478,7 @@ function PollCard({ poll }: { poll: Poll }) {
         </Link>
         <Link href={`/admin/polls/${poll.id}/keys`} className="flex-1">
           <Button variant="secondary" className="w-full">
-            🔑 Keys
+            <FaKey className="inline mr-2" /> Keys
           </Button>
         </Link>
       </div>

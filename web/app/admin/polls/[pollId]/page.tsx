@@ -4,6 +4,7 @@ import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FaKey, FaRedo, FaLightbulb, FaClock, FaCheckCircle, FaExclamationTriangle, FaChartBar, FaClipboard, FaEye, FaPause, FaPlay, FaTrash, FaFileDownload } from 'react-icons/fa';
 import AnimatedBackground from '../../../components/AnimatedBackground';
 import GlassCard from '../../../components/GlassCard';
 import Button from '../../../components/Button';
@@ -163,7 +164,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
         throw new Error(data.error || 'Failed to manage instance');
       }
 
-      setMessage(`✅ Instance ${operation}d successfully`);
+      setMessage(`Instance ${operation}d successfully`);
       
       // Reload poll details
       await loadPollDetails();
@@ -238,7 +239,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
             </div>
             <GlassCard className="border-2 border-[var(--error)] bg-[var(--error-light)]">
               <h2 className="text-xl font-bold mb-2 text-[var(--error)] flex items-center gap-2">
-                <span>⚠️</span>
+                <FaExclamationTriangle />
                 Error Loading Poll
               </h2>
               <p className="text-[var(--error)]">{error || 'Poll not found'}</p>
@@ -269,7 +270,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
             </Link>
             <Link href={`/admin/polls/${pollId}/keys`}>
               <Button variant="primary">
-                🔑 Access Keys
+                <FaKey className="inline mr-2" /> Access Keys
               </Button>
             </Link>
           </motion.div>
@@ -289,17 +290,17 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
                   )}
                   <div className="flex flex-wrap gap-2">
                     {poll.isRecurring && (
-                      <span className="px-3 py-1 glass rounded-full text-sm font-medium text-[var(--accent-primary)] border border-[var(--accent-primary)]">
-                        🔄 {getRecurrenceLabel(poll.recurrenceType)}
+                      <span className="px-3 py-1 glass rounded-full text-sm font-medium text-[var(--accent-primary)] border border-[var(--accent-primary)] flex items-center gap-1">
+                        <FaRedo /> {getRecurrenceLabel(poll.recurrenceType)}
                       </span>
                     )}
                     {poll.allowSuggestions && (
-                      <span className="px-3 py-1 glass rounded-full text-sm font-medium text-[var(--accent-secondary)] border border-[var(--accent-secondary)]">
-                        💡 Suggestions Enabled
+                      <span className="px-3 py-1 glass rounded-full text-sm font-medium text-[var(--accent-secondary)] border border-[var(--accent-secondary)] flex items-center gap-1">
+                        <FaLightbulb /> Suggestions Enabled
                       </span>
                     )}
-                    <span className="px-3 py-1 glass rounded-full text-sm font-medium text-[var(--foreground-secondary)] border border-[var(--glass-border)]">
-                      ⏱️ {poll.durationDays || 'N/A'} days duration
+                    <span className="px-3 py-1 glass rounded-full text-sm font-medium text-[var(--foreground-secondary)] border border-[var(--glass-border)] flex items-center gap-1">
+                      <FaClock /> {poll.durationDays || 'N/A'} days duration
                     </span>
                   </div>
                 </div>
@@ -321,8 +322,8 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
                   whileHover={{ scale: 1.02 }}
                 >
                   <div className="text-[var(--success)] text-sm font-medium mb-1">Status</div>
-                  <div className="text-2xl font-bold text-[var(--foreground)]">
-                    {activeInstance ? '🟢 Active' : '⚪ Inactive'}
+                  <div className="text-2xl font-bold text-[var(--foreground)] flex items-center gap-2">
+                    {activeInstance ? <><span className="text-green-500">●</span> Active</> : <><span className="text-gray-400">●</span> Inactive</>}
                   </div>
                 </motion.div>
                 <motion.div
@@ -356,7 +357,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
             >
               <GlassCard variant="elevated" className="mb-6 border-2 border-[var(--success)]">
                 <h2 className="text-2xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
-                  <span>🟢</span>
+                  <span className="text-green-500">●</span>
                   Active Instance
                 </h2>
                 <div className="glass rounded-lg p-6 border border-[var(--success)]">
@@ -412,7 +413,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
             <GlassCard variant="elevated">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-[var(--foreground)] flex items-center gap-2">
-                  <span>📊</span>
+                  <FaChartBar />
                   Results
                 </h2>
                 {activeInstance && (
@@ -420,7 +421,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
                     onClick={() => loadResults(selectedInstanceId)}
                     variant="primary"
                   >
-                    🔄 Refresh Results
+                    <FaRedo className="inline mr-2" /> Refresh Results
                   </Button>
                 )}
               </div>
@@ -475,7 +476,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
                 </div>
               ) : (
                 <div className="text-center py-12 text-[var(--foreground-muted)]">
-                  <div className="text-6xl mb-4">📭</div>
+                  <FaFileDownload className="text-6xl mb-4 mx-auto opacity-50" />
                   <div>No votes yet for this poll instance</div>
                 </div>
               )}
@@ -491,7 +492,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
             >
               <GlassCard variant="elevated" className="mt-6">
                 <h2 className="text-2xl font-bold text-[var(--foreground)] mb-6 flex items-center gap-2">
-                  <span>📋</span>
+                  <FaClipboard />
                   All Instances
                 </h2>
                 
@@ -550,7 +551,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
                             variant="secondary"
                             className="text-sm"
                           >
-                            📊 Results
+                            <FaChartBar className="inline mr-1" /> Results
                           </Button>
                           
                           {instance.status === 'Active' ? (
@@ -560,7 +561,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
                               variant="secondary"
                               className="text-sm"
                             >
-                              ⏸️ Close
+                              <FaPause className="inline mr-1" /> Close
                             </Button>
                           ) : (
                             <Button
@@ -569,7 +570,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
                               variant="primary"
                               className="text-sm"
                             >
-                              ▶️ Reopen
+                              <FaPlay className="inline mr-1" /> Reopen
                             </Button>
                           )}
                           
@@ -579,7 +580,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
                             variant="danger"
                             className="text-sm"
                           >
-                            🗑️ Delete
+                            <FaTrash className="inline mr-1" /> Delete
                           </Button>
                         </div>
                       </div>
@@ -601,7 +602,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
               >
                 <GlassCard className="border-2 border-[var(--success)] bg-[var(--success-light)]">
                   <div className="flex items-center gap-2 text-[var(--success)]">
-                    <span className="text-xl">✅</span>
+                    <FaCheckCircle className="text-xl" />
                     <span>{message}</span>
                   </div>
                 </GlassCard>
@@ -617,7 +618,7 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
               >
                 <GlassCard className="border-2 border-[var(--error)] bg-[var(--error-light)]">
                   <div className="flex items-center gap-2 text-[var(--error)]">
-                    <span className="text-xl">⚠️</span>
+                    <FaExclamationTriangle className="text-xl" />
                     <span>{error}</span>
                   </div>
                 </GlassCard>
@@ -637,12 +638,12 @@ export default function ManagePollPage({ params }: { params: Promise<{ pollId: s
               target="_blank"
             >
               <Button variant="secondary" className="w-full py-4 text-lg">
-                👁️ Preview Voting Page
+                <FaEye className="inline mr-2" /> Preview Voting Page
               </Button>
             </Link>
             <Link href={`/admin/polls/${pollId}/keys`}>
               <Button variant="primary" className="w-full py-4 text-lg">
-                🔑 Manage Access Keys
+                <FaKey className="inline mr-2" /> Manage Access Keys
               </Button>
             </Link>
           </motion.div>
