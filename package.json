@@ -1,0 +1,17 @@
+{
+  "name": "poll-system",
+  "version": "1.0.0",
+  "description": "Serverless poll system with AWS and Vercel",
+  "private": true,
+  "workspaces": [
+    "web",
+    "infra"
+  ],
+  "scripts": {
+    "web:dev": "cd web && npm run dev",
+    "web:build": "cd web && npm run build",
+    "infra:deploy": "cd infra && npm run cdk deploy",
+    "infra:synth": "cd infra && npm run cdk synth"
+  }
+}
+
